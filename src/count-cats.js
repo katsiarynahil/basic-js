@@ -1,4 +1,3 @@
-
 module.exports = function countCats(arr) {
 
   let matrix = [].concat(...arr);
