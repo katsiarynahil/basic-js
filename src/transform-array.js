@@ -4,42 +4,57 @@ module.exports = function transform(arr) {
     throw new Error();
   }
 
-  let medium = [...arr];
+  let medium = Array.from(arr);
   let transformedArray = [];
-  let resultingIndex = 0;
 
   for(let i = 0; i < medium.length; i++){
     let element = medium[i];
 
     switch(element){
       case '--discard-next':
-        if(i + 1 < medium.length){
-          medium.splice(i + 1);
-        }
-        transformedArray.push(element);
+        discardNextElement(medium, i);
         break;
       case '--discard-prev':
-          transformedArray.pop();
+        discardPreviousElement(transformedArray, medium, i);
         break;
-        transformedArray.push(element);
       case '--double-next':
-        if(i+1 < medium.length){
-          let elementToDouble = medium[i+1];
-          medium.splice(i+1, 0, elementToDouble);
-        }
-        transformedArray.push(element);
+        doubleNextElement(medium, i);
         break;
       case '--double-prev': 
-        if(i-1 >= 0){
-          let elementToDouble = transformedArray[transformedArray.length-1];
-          transformedArray.push(elementToDouble);
-        }  
-        transformedArray.push(element);     
+        doublePreviousElement(transformedArray, medium, i);
         break;
       default:
         transformedArray.push(element);
     }
   }
-  let result = transformedArray.filter(element => element != '--discard-next' && element != '--discard-prev' && element != '--double-next' && element != '--double-prev');
-  return result;
+  return transformedArray;
 };
+
+
+function discardNextElement(medium, i){
+  if(medium.length > i + 1){
+    medium.splice(i + 1, 1);
+  }
+}
+
+function discardPreviousElement(transformedArray, medium, i){
+  let badPreviousElements = ['--discard-next', '--discard-prev', '--double-next', '--double-prev'];
+  if(!badPreviousElements.includes(medium[i - 1])){
+    transformedArray.pop()
+  }
+}
+
+function doubleNextElement(medium, i){
+  if(i + 1 < medium.length){
+    medium.splice(i+1, 0, medium[i + 1]);
+  }
+}
+
+function doublePreviousElement(transformedArray, medium, i){
+  let badPreviousElements = ['--discard-next', '--discard-prev', '--double-next', '--double-prev'];
+  if(i - 1 >= 0 && i - 1 < medium.length){
+    if(!badPreviousElements.includes(medium[i - 1])){
+      transformedArray.push(medium[i - 1]);
+    }
+  }
+}
